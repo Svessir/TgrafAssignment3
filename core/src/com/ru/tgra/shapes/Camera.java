@@ -22,8 +22,7 @@ public class Camera {
     float top;
     float near;
     float far;
-    float foyv;
-    float ratio;
+
 
     private int viewMatrixPointer;
     private FloatBuffer matrixBuffer;
@@ -139,7 +138,7 @@ public class Camera {
         n.z = v.z * (-s) + n.z * c;
         v.z = tmp;
     }
-
+/*
     public void setShaderMatrix(){
         Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
 
@@ -154,7 +153,7 @@ public class Camera {
         matrixBuffer.rewind();
         Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
     }
-
+*/
     public void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
         this.left = left;
         this.right = right;
@@ -166,7 +165,7 @@ public class Camera {
     }
 
     public void PerspctiveProjection3D(float fovy, float ratio, float near, float far) {
-        this.top = (float) (near * Math.tan((foyv/2.0 * Math.PI/180.0)));
+        this.top = (float) (near * Math.tan((fovy/2.0) * (Math.PI/180.0)));
         this.bottom = -top;
         this.right = top * ratio;
         this.left = -right;
@@ -187,8 +186,10 @@ public class Camera {
         }else {
             pm[0] = (2.0f * near) / (right - left); pm[4] = 0.0f; pm[8] = (right + left) / (right - left); pm[12] = 0.0f;
             pm[1] = 0.0f; pm[5] = (2.0f * near) / (top - bottom); pm[9] = (top + bottom) / (top - bottom); pm[13] = 0.0f;
-            pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = -(far + near) / (near - far); pm[14] = -(2.0f* near + far) / (near - far);
+            pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = -(far + near) / (far - near); pm[14] = -(2.0f* near * far) / (far - near);
             pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = -1.0f; pm[15] = 0.0f;
+
+
         }
 
         matrixBuffer = BufferUtils.newFloatBuffer(16);
@@ -203,6 +204,8 @@ public class Camera {
         pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
         pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
 
+
+        matrixBuffer = BufferUtils.newFloatBuffer(16);
         matrixBuffer.put(pm);
         matrixBuffer.rewind();
         Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);

@@ -12,7 +12,7 @@ import java.nio.FloatBuffer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 
-public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor {
+public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 	private FloatBuffer matrixBuffer;
 
@@ -30,7 +30,7 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 	private int colorLoc;
 	Camera cam;
 
-	int size = 100;
+	int size = 10;
 	
 	Maze maze;
 
@@ -107,11 +107,11 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		//OrthographicProjection3D(-2, 2, -2, 2, 1, 100);
-		perspctiveProjection3D();
-		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
-		cam.Look3D(new Point3D(0.0f, 25.0f, 10.0f), new Point3D(25,3,25), new Vector3D(0,1,0));
 		//perspctiveProjection3D();
-		//cam.setShaderMatrices();
+		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
+		cam.Look3D(new Point3D(0.0f, 10f, 10.0f), new Point3D(0,3,0), new Vector3D(0,1,0));
+		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
+		cam.setShaderMatrices();
 		maze = new Maze(size);
 		
 		
@@ -160,7 +160,9 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
-		cam.setShaderMatrix();
+		//cam.setShaderMatrix();
+		cam.setShaderMatrices();
+		//perspctiveProjection3D();
 		ModelMatrix.main.loadIdentityMatrix();
 		
 		
