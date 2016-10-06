@@ -7,7 +7,8 @@ public class Cell implements GameObject{
     public boolean left;
     public boolean bottom;
     public static final float width = 1f;
-    public static final float height = 1f;
+    public static final float length = 1f;
+	public  static final float height = 1f;
     
     public Cell() {
         left = true;
@@ -21,7 +22,7 @@ public class Cell implements GameObject{
     
     public void draw() {
     	float translationX = width / 2.0f;
-    	float translationZ = height / 2.0f;
+    	float translationZ = length / 2.0f;
     	
     	if (left) {
 	    	ModelMatrix.main.pushMatrix();

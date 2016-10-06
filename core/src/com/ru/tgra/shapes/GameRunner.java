@@ -107,50 +107,43 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		//OrthographicProjection3D(-2, 2, -2, 2, 1, 100);
-		//perspctiveProjection3D();
 		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
-		cam.Look3D(new Point3D(0.0f, 10f, 10.0f), new Point3D(0,3,0), new Vector3D(0,1,0));
-		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
+		cam.Look3D(new Point3D((size/2), 0f, (size/2)), new Point3D(0, 0.5f ,0), new Vector3D(0, 1, 0));
+		cam.PerspctiveProjection3D(90, 1, 0.01f, 100);
 		cam.setShaderMatrices();
 		maze = new Maze(size);
 		
 		
 	}
 
-	private void input()
-	{
-	}
-
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
-		//cam.Look3D(new Point3D(0.0f, cubeElevation, 2.0f), new Point3D(0,0,0), new Vector3D(0,1,0));
-
 
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			cam.yawIgnoreY(90.0f * deltaTime);
+			cam.yawIgnoreY(60.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			cam.yawIgnoreY(-90.0f * deltaTime);
+			cam.yawIgnoreY(-60.0f * deltaTime);
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+		/*if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
 			cam.pitch(-90.0f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 			cam.pitch(90.0f * deltaTime);
-		}
+		}*/
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			cam.slide(-2.5f * deltaTime, 0, 0);
+			cam.slide(-1.1f * deltaTime, 0, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-			cam.slide(2.5f * deltaTime, 0, 0);
+			cam.slide(1.1f * deltaTime, 0, 0);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-			cam.slide(0, 0, -2.5f * deltaTime);
+			cam.slideIgnoreY(0, 0, -1.1f * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-			cam.slide(0, 0, 2.5f * deltaTime);
+			cam.slideIgnoreY(0, 0, 1.1f * deltaTime);
 		}
 		//do all updates to the game
 	}
@@ -160,9 +153,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
-		//cam.setShaderMatrix();
 		cam.setShaderMatrices();
-		//perspctiveProjection3D();
 		ModelMatrix.main.loadIdentityMatrix();
 		
 		
@@ -172,7 +163,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void render () {
 
-		//input();
 		//put the code inside the update and display methods, depending on the nature of the code
 		update();
 		display();
