@@ -155,7 +155,7 @@ public class Camera {
         Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
     }
 
-    private void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
+    public void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
         this.left = left;
         this.right = right;
         this.bottom = bottom;
@@ -165,8 +165,7 @@ public class Camera {
         orthographic = true;
     }
 
-    private void PerspctiveProjection3D(float fovy, float ratio) {
-        //reikna hér ratio, foyv, near, far
+    public void PerspctiveProjection3D(float fovy, float ratio, float near, float far) {
         this.top = (float) (near * Math.tan((foyv/2.0 * Math.PI/180.0)));
         this.bottom = -top;
         this.right = top * ratio;

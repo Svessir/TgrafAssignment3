@@ -28,18 +28,11 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 	private int projectionMatrixLoc;
 
 	private int colorLoc;
-	private float rotationAngle;
-	private float cubeElevation;
 	Camera cam;
 
-	CellEdges cellEdges;
-	CellEdges[][] edges;
-	MapGenerator mapGenerator;
-	CellEdges[][] cells;
-
-	int size = 15;
-
-	//private ModelMatrix modelMatrix;
+	int size = 100;
+	
+	Maze maze;
 
 	@Override
 	public void create () {
@@ -117,12 +110,11 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 		perspctiveProjection3D();
 		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
 		cam.Look3D(new Point3D(0.0f, 25.0f, 10.0f), new Point3D(25,3,25), new Vector3D(0,1,0));
-		cellEdges = new CellEdges();
-		edges = new CellEdges[size][size];
-		edges = cellEdges.generateArray(size);
-		cells = new CellEdges[size][size];
-		mapGenerator = new MapGenerator();
-		cells = mapGenerator.generateNewMap(size-1);
+		//perspctiveProjection3D();
+		//cam.setShaderMatrices();
+		maze = new Maze(size);
+		
+		
 	}
 
 	private void input()
@@ -132,10 +124,6 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 	private void update()
 	{
 		float deltaTime = Gdx.graphics.getDeltaTime();
-
-		rotationAngle += 180.0f * deltaTime;
-
-		cubeElevation = (float) Math.sin(rotationAngle * Math.PI / 180.0f);
 
 		//cam.Look3D(new Point3D(0.0f, cubeElevation, 2.0f), new Point3D(0,0,0), new Vector3D(0,1,0));
 
@@ -174,91 +162,9 @@ public class LabFirst3DGame extends ApplicationAdapter implements InputProcessor
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
 		cam.setShaderMatrix();
 		ModelMatrix.main.loadIdentityMatrix();
-
-
-/*
-		edges[6][0].left = false;
-		edges[5][1].left = false;
-		edges[5][1].bottom = false;
-		edges[4][2].bottom = false;
-		edges[5][2].left = false;
-		edges[6][2].left = false;
-*/
-
-		//do all actual drawing and rendering here
-		for(int i = 0; i < size; i++){
-			ModelMatrix.main.addTranslation(1f, 0, 0);
-			ModelMatrix.main.pushMatrix();
-			for(int j = 0; j < size; j++){
-				ModelMatrix.main.addTranslation(0, 0, 1f);
-				ModelMatrix.main.pushMatrix();
-				if(cells[i][j].bottom) {
-					ModelMatrix.main.addTranslation(0.5f, 0, 0);
-					ModelMatrix.main.addScale(1, 1, 0.2f);
-					ModelMatrix.main.setShaderMatrix();
-					BoxGraphic.drawSolidCube();
-				}
-				ModelMatrix.main.popMatrix();
-				ModelMatrix.main.pushMatrix();
-				if(cells[i][j].left) {
-					ModelMatrix.main.addTranslation(0, 0, 0.5f);
-					ModelMatrix.main.addScale(0.2f, 1, 1);
-					ModelMatrix.main.setShaderMatrix();
-					BoxGraphic.drawSolidCube();
-				}
-				ModelMatrix.main.popMatrix();
-			}
-			ModelMatrix.main.popMatrix();
-		}
-
-
-		/*Random rand = new Random();
-		int size = 15;
-		for(int i = 0; i < size; i++){
-			ModelMatrix.main.addTranslation(1f, 0, 0);
-			ModelMatrix.main.pushMatrix();
-			for(int j = 0; j < size; j++){
-				//ModelMatrix.main.addScale(0.2f, 0f, 1.0f);
-				ModelMatrix.main.addTranslation(0, 0, 1f);
-				ModelMatrix.main.pushMatrix();
-				ModelMatrix.main.addScale(0.2f, 1f, 1f);
-				BoxGraphic.drawSolidCube();
-				ModelMatrix.main.setShaderMatrix();
-				ModelMatrix.main.popMatrix();
-				ModelMatrix.main.addRotationZ(90);
-				ModelMatrix.main.pushMatrix();
-				BoxGraphic.drawSolidCube();
-				ModelMatrix.main.popMatrix();
-			}*/
-		/*
-		int maxLevel = 9;
-
-		ModelMatrix.main.pushMatrix();
-		for (int level = 0; level < maxLevel; level++){
-			ModelMatrix.main.addTranslation(0.55f, 1.0f, -0.55f);
-			//ModelMatrix.main.addRotationZ(rotationAngle * 0.323123f);
-			ModelMatrix.main.pushMatrix();
-			for(int i = 0; i < maxLevel - level; i++){
-				ModelMatrix.main.addTranslation(1.1f, 0, 0);
-				ModelMatrix.main.pushMatrix();
-				for(int j = 0; j < maxLevel - level; j++){
-					ModelMatrix.main.addTranslation(0, 0, -1.1f);
-					ModelMatrix.main.pushMatrix();
-					if(i % 2 == 0){
-						ModelMatrix.main.addScale(0.2f, 1.0f, 1.0f);
-					}else{
-						ModelMatrix.main.addScale(1.0f, 1.0f, 0.2f);
-					}
-					BoxGraphic.drawSolidCube();
-					//SphereGraphic.drawSolidSphere();
-					ModelMatrix.main.setShaderMatrix();
-					ModelMatrix.main.popMatrix();
-				}
-				ModelMatrix.main.popMatrix();
-			}
-			ModelMatrix.main.popMatrix();
-		}
-		ModelMatrix.main.popMatrix();*/
+		
+		
+		maze.draw();
 	}
 
 	@Override

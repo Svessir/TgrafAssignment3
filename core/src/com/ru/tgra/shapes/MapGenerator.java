@@ -1,58 +1,55 @@
 package com.ru.tgra.shapes;
 
 import java.awt.*;
-import java.util.EmptyStackException;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
 /**
- * Created by Kárii on 4.10.2016.
+ * Created by Sverrir on 6.10.2016.
  */
 public class MapGenerator {
     private class NoMoveException extends Exception {
     }
-
-    private CellEdges[][] cells;
+    
+    private Cell[][] cells;
     private boolean[][] visited;
     private Stack<Point> positionStack;
     private Point currentPos;
-
-    public CellEdges[][] generateNewMap(int dimension) {
-        int size = dimension + 2;
-        cells = new CellEdges[size][size];
+    
+    private Point[] allMoves = 
+    	{
+    		new Point(1, 0),
+    		new Point(0, 1),
+    		new Point(-1, 0),
+    		new Point(0, -1)
+    	};
+    
+    public Cell[][] generateNewMap(int dimension) {
+        int size = dimension + 1;
+        cells = new Cell[size][size];
         visited = new boolean[size][size];
         positionStack = new Stack<Point>();
+        
+        for(int x = 0; x < size; x++) {
+        	for(int z = 0; z < size; z++)
+        		cells[x][z] = new Cell(true, true);
+        }
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i == size - 2 && j == size - 2) {
-                    cells[i][j] = new CellEdges(false, false);
-                } else if (i == size - 2) {
-                    cells[i][j] = new CellEdges(true, false);
-                } else if (j == size - 2) {
-                    cells[i][j] = new CellEdges(false, true);
-                } else {
-                    cells[i][j] = new CellEdges();
-                }
+        for (int x = 0; x < size; x++) {
+            for (int z = 0; z < size; z++) {
+            	if(x == size - 1) {
+            		markAsVisited(x, z);
+            		cells[x][z].bottom = false;
+            	}
+            	if(z == size - 1) {
+            		markAsVisited(x, z);
+            		cells[x][z].left = false;
+            	}
             }
         }
         curvePath();
-        /*while(!allVisited(dimension))
-        {
-            curvePath();
-        }*/
         return cells;
-    }
-
-    private boolean allVisited(int dimension){
-        for(int i = 0; i < dimension - 2; i++){
-            for(int j = 0; j < dimension - 2; j++){
-                if(!visited[i][j]){
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private Point getStartingPosition() {
@@ -63,121 +60,78 @@ public class MapGenerator {
     }
 
     private void curvePath() {
-        Point pos = getStartingPosition();
-        currentPos = pos;
-        int i = 0;
-        System.out.println(currentPos);
-        do{
-            try {
-                if(!isVisited(pos)){
-                    positionStack.push(pos);
-                    System.out.println("Position being push : " + pos);
-                }
-                markAsVisited(currentPos);
-
-                currentPos = getNextMoveAndBreakDownEdge(currentPos);
-            }
-            catch (NoMoveException mex) {
-                System.out.println(currentPos);
-                System.out.println("Pop : " + positionStack.peek()  + "   size of stack = " + positionStack.size());
-                Point tmp = positionStack.pop();
-                System.out.println("After pop : " + tmp + "   size of stack = " + positionStack.size());
-                currentPos = tmp;
-            }
-            i++;
-        }while (!positionStack.empty());
-
+    	currentPos = getStartingPosition();
+    	markAsVisited(currentPos.x, currentPos.y);
+    	
+    	do {
+    		try {
+				Point move = getNextMove();
+				makeMove(move);
+			} catch (NoMoveException mex) {
+				if(!positionStack.isEmpty())
+					currentPos = positionStack.pop();
+				else
+					break;
+			}
+    		
+    	}while(true);
+    	
     }
-
-    private void markAsVisited(Point pos) {
-        visited[pos.x][pos.y] = true;
+    
+    private Point getNextMove() throws NoMoveException{
+    	Point[] moves = getPossibleMoves();
+    	
+    	if(moves.length == 0)
+    		throw new NoMoveException();
+    	
+    	Random rand = new Random();
+    	int moveIndex = rand.nextInt(moves.length);
+    	return moves[moveIndex];
     }
-
-    private boolean isVisited(Point pos) {
-        return visited[pos.x][pos.y];
+    
+    private Point[] getPossibleMoves() {
+    	ArrayList<Point> possibleMoves = new ArrayList<Point>();
+    	for(int i = 0; i < allMoves.length; i++) {
+    		if(isMoveValid(allMoves[i]))
+    			possibleMoves.add(allMoves[i]);
+    	}
+    	
+    	Point[] moves = new Point[possibleMoves.size()];
+    	
+    	for(int i = 0; i < moves.length; i++)
+    		moves[i] = possibleMoves.get(i);
+    	
+    	return moves;
     }
-
-    private Point getNextMoveAndBreakDownEdge(Point pos) throws NoMoveException{
-        Random rand = new Random();
-        int direction;
-        while(canMove(pos)) {
-            direction = rand.nextInt(4);
-            if (direction == 0) {
-                if (goUp(pos) && !isVisited(new Point(pos.x, pos.y + 1))) {
-                    pos.y += 1;
-                    cells[pos.x][pos.y].bottom = false;
-                    System.out.println("UP");
-                    return pos;
-                }
-            } else if (direction == 1) {
-                if (goRight(pos) && !isVisited(new Point(pos.x + 1, pos.y))) {
-                    pos.x += 1;
-                    cells[pos.x][pos.y].left = false;
-                    System.out.println("Right");
-                    return pos;
-                }
-            } else if (direction == 2) {
-                if (goDown(pos) && !isVisited(new Point(pos.x, pos.y - 1))) {
-                    cells[pos.x][pos.y].bottom = false;
-                    pos.y -= 1;
-                    System.out.println("Down");
-                    return pos;
-                }
-            } else if (direction == 3) {
-                if (goLeft(pos) && !isVisited(new Point(pos.x - 1, pos.y))) {
-                    cells[pos.x][pos.y].left = false;
-                    pos.x -= 1;
-                    System.out.println("Left");
-                    return pos;
-                }
-            }
-        }
-        throw new NoMoveException();
+    
+    private boolean isMoveValid(Point move) {
+    	int x = currentPos.x + move.x;
+    	int z = currentPos.y + move.y;
+    	
+    	if(x >= cells.length || z >= cells[0].length || x < 0 || z < 0)
+    		return false;
+    	
+    	return !visited[x][z];
     }
-
-    private boolean goLeft(Point pos) {
-        return pos.x > 1;
+    
+    private void makeMove(Point move) {
+    	Point newPos = new Point(currentPos.x + move.x, currentPos.y + move.y);
+    	markAsVisited(newPos.x, newPos.y);
+    	
+    	if(move.equals(allMoves[0]))
+    		cells[newPos.x][newPos.y].left = false;
+    	else if(move.equals(allMoves[1]))
+    		cells[newPos.x][newPos.y].bottom = false;
+    	else if(move.equals(allMoves[2]))
+    		cells[currentPos.x][currentPos.y].left = false;
+		else if(move.equals(allMoves[3]))
+			cells[currentPos.x][currentPos.y].bottom = false;
+    	
+    	positionStack.push(currentPos);
+    	currentPos = newPos;
     }
-
-    private boolean goDown(Point pos) {
-        return pos.y > 1;
-    }
-
-    private boolean goRight(Point pos) {
-        return pos.x < cells.length - 3;
-    }
-
-    private boolean goUp(Point pos) {
-        return pos.y < cells.length - 3;
-    }
-
-    private boolean canMove(Point pos){
-        int cnt = 0;
-        if(goUp(pos)){
-            if(!visited[pos.x][pos.y+1]){
-                cnt++;
-            }
-
-        }
-        if(goRight(pos)){
-            if(!visited[pos.x+1][pos.y]){
-                cnt++;
-            }
-        }
-        if(goDown(pos)){
-            if(!visited[pos.x][pos.y-1]){
-                cnt++;
-            }
-        }
-        if(goLeft(pos)){
-            if(!visited[pos.x-1][pos.y]){
-                cnt++;
-            }
-        }
-        System.out.println(cnt);
-        if(cnt > 0){
-            return true;
-        }
-        return false;
+    
+    private void markAsVisited(int x, int z) {
+        visited[x][z] = true;
     }
 }
