@@ -25,8 +25,8 @@ public class Camera extends AbstractGameObject {
     private float far;
 
     private Vector3D velocity;
-    private final float speed = 2.5f;
-    private final float rotationPerSecond = 90f;
+    private final float speed = 1.1f;
+    private final float rotationPerSecond = 60f;
     private final float cameraRadius = 0.1f;
     
     private int viewMatrixPointer;
@@ -212,10 +212,10 @@ public class Camera extends AbstractGameObject {
     	velocity = new Vector3D(0,0,0);
     	
     	if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			yawIgnoreY(90.0f * deltaTime);
+			yawIgnoreY(rotationPerSecond * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			yawIgnoreY(-90.0f * deltaTime);
+			yawIgnoreY(-rotationPerSecond * deltaTime);
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
 			velocity.x -= speed *deltaTime;

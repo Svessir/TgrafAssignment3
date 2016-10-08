@@ -97,7 +97,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		ModelMatrix.main.setShaderMatrix(modelMatrixLoc);
 
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-
+		
 		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
 		cam.Look3D(new Point3D(2, 0, 5), new Point3D(0,0,0), new Vector3D(0,1,0));
 		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
@@ -105,10 +105,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		maze = new Maze(size);
 		
 		
-	}
-
-	private void input()
-	{
 	}
 
 	private void update()

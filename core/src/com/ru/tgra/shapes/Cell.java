@@ -7,7 +7,8 @@ public class Cell implements GameObject{
     public boolean left;
     public boolean bottom;
     public static final float width = 1f;
-    public static final float height = 1f;
+    public static final float length = 1f;
+	public  static final float height = 1f;
     
     public Wall leftWall;
     public Wall bottomWall;

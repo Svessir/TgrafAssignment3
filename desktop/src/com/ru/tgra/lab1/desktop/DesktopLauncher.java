@@ -11,6 +11,7 @@ public class DesktopLauncher {
 		config.title = "Maze Game"; // or whatever you like
 		config.width = 1200;  //experiment with
 		config.height = 600;  //the window size
+		
 		config.x = 150;
 		config.y = 50;
 		//config.fullscreen = true;
