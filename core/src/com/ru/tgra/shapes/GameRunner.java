@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 
 import java.nio.FloatBuffer;
 
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -28,9 +29,10 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	private int projectionMatrixLoc;
 
 	private int colorLoc;
-	Camera cam;
+	private Camera cam;
+	private Camera orthoCam;
 
-	int size = 10;
+	int size = 20;
 	
 	Maze maze;
 
@@ -75,21 +77,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		Gdx.gl.glUseProgram(renderingProgramID);
 
-		//OrthographicProjection3D(0, Gdx.graphics.getWidth(), 0, Gdx.graphics.getHeight(), -1, 1);
-/*
-		float[] mm = new float[16];
-
-		mm[0] = 1.0f; mm[4] = 0.0f; mm[8] = 0.0f; mm[12] = 0.0f;
-		mm[1] = 0.0f; mm[5] = 1.0f; mm[9] = 0.0f; mm[13] = 0.0f;
-		mm[2] = 0.0f; mm[6] = 0.0f; mm[10] = 1.0f; mm[14] = 0.0f;
-		mm[3] = 0.0f; mm[7] = 0.0f; mm[11] = 0.0f; mm[15] = 1.0f;
-
-		modelMatrixBuffer = BufferUtils.newFloatBuffer(16);
-		modelMatrixBuffer.put(mm);
-		modelMatrixBuffer.rewind();
-
-		Gdx.gl.glUniformMatrix4fv(modelMatrixLoc, 1, false, modelMatrixBuffer);
-*/
 		//COLOR IS SET HERE
 		Gdx.gl.glUniform4f(colorLoc, 0.7f, 0.2f, 0, 1);
 
@@ -112,6 +99,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		cam.PerspctiveProjection3D(90, 1, 0.01f, 100);
 		cam.setShaderMatrices();
 		maze = new Maze(size);
+		orthoCam = new Camera(viewMatrixLoc, projectionMatrixLoc);
+		orthoCam.OrthographicProjection3D(-size, size, -size, size, 0.4f, 1000);
 		
 		
 	}
@@ -155,9 +144,22 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
 		cam.setShaderMatrices();
 		ModelMatrix.main.loadIdentityMatrix();
-		
-		
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cam.setShaderMatrices();
 		maze.draw();
+		Gdx.gl.glViewport(-400, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+		orthoCam.Look3D(new Point3D(7.0f, 40.0f, 7.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0, 0, -1));
+		//orthoCam.Look3D(new Point3D(cam.eye.x, 40.0f, cam.eye.z), cam.eye, new Vector3D(0, 0, -1));
+		orthoCam.setShaderMatrices();
+		maze.draw();
+		Gdx.gl.glUniform4f(colorLoc, 1, 1, 1, 1.0f);
+		ModelMatrix.main.pushMatrix();
+		ModelMatrix.main.addTranslation(cam.eye.x, cam.eye.y, cam.eye.z);
+		ModelMatrix.main.addScale(0.5f, 0.5f, 0.5f);
+		ModelMatrix.main.setShaderMatrix();
+		BoxGraphic.drawSolidCube();
+		ModelMatrix.main.popMatrix();
 	}
 
 	@Override
@@ -166,58 +168,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		//put the code inside the update and display methods, depending on the nature of the code
 		update();
 		display();
-
-	}
-
-	private void Look3D(Point3D eye, Point3D center, Vector3D up) {
-
-		Vector3D n = Vector3D.difference(eye, center);
-		Vector3D u = up.cross(n);
-		n.normalize();
-		u.normalize();
-		Vector3D v = n.cross(u);
-
-		Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
-
-		float[] pm = new float[16];
-
-		pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
-		pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
-		pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(viewMatrixLoc, 1, false, matrixBuffer);
-	}
-
-	/*private void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
-		float[] pm = new float[16];
-
-		pm[0] = 2.0f / (right - left); pm[4] = 0.0f; pm[8] = 0.0f; pm[12] = -(right + left) / (right - left);
-		pm[1] = 0.0f; pm[5] = 2.0f / (top - bottom); pm[9] = 0.0f; pm[13] = -(top + bottom) / (top - bottom);
-		pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = 2.0f / (near - far); pm[14] = (near + far) / (near - far);
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(projectionMatrixLoc, 1, false, matrixBuffer);
-	}*/
-
-	private void perspctiveProjection3D() {
-		float[] pm = new float[16];
-
-		pm[0] = 1.0f; pm[4] = 0.0f; pm[8] = 0.0f; pm[12] = 0.0f;
-		pm[1] = 0.0f; pm[5] = 1.0f; pm[9] = 0.0f; pm[13] = 0.0f;
-		pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = -1.02f; pm[14] = -2.02f;
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = -1.0f; pm[15] = 0.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(projectionMatrixLoc, 1, false, matrixBuffer);
 
 	}
 

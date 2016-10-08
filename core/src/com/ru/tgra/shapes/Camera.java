@@ -138,22 +138,7 @@ public class Camera {
         n.z = v.z * (-s) + n.z * c;
         v.z = tmp;
     }
-/*
-    public void setShaderMatrix(){
-        Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
 
-        float[] pm = new float[16];
-        pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
-        pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
-        pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
-        pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-        matrixBuffer = BufferUtils.newFloatBuffer(16);
-        matrixBuffer.put(pm);
-        matrixBuffer.rewind();
-        Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
-    }
-*/
     public void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
         this.left = left;
         this.right = right;
