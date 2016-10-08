@@ -13,7 +13,7 @@ public class Camera extends AbstractGameObject {
     private Vector3D n;
     private Vector3D u;
     private Vector3D v;
-    private Point3D eye;
+    public Point3D eye;
     
     private boolean orthographic;
 

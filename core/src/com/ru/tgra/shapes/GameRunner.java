@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 
 import java.nio.FloatBuffer;
 
+import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -26,9 +27,10 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	private int projectionMatrixLoc;
 
 	private int colorLoc;
-	Camera cam;
+	private Camera cam;
+	private Camera orthoCam;
 
-	int size = 10;
+	int size = 20;
 	
 	Maze maze;
 	
@@ -103,6 +105,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
 		cam.setShaderMatrices();
 		maze = new Maze(size);
+		orthoCam = new Camera(viewMatrixLoc, projectionMatrixLoc);
+		orthoCam.OrthographicProjection3D(-size, size, -size, size, 0.4f, 1000);
 		
 		
 	}
@@ -120,9 +124,22 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
 		cam.setShaderMatrices();
 		ModelMatrix.main.loadIdentityMatrix();
-		
-		
+
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cam.setShaderMatrices();
 		maze.draw();
+		Gdx.gl.glViewport(-400, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+		orthoCam.Look3D(new Point3D(7.0f, 40.0f, 7.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0, 0, -1));
+		//orthoCam.Look3D(new Point3D(cam.eye.x, 40.0f, cam.eye.z), cam.eye, new Vector3D(0, 0, -1));
+		orthoCam.setShaderMatrices();
+		maze.draw();
+		Gdx.gl.glUniform4f(colorLoc, 1, 1, 1, 1.0f);
+		ModelMatrix.main.pushMatrix();
+		ModelMatrix.main.addTranslation(cam.eye.x, cam.eye.y, cam.eye.z);
+		ModelMatrix.main.addScale(0.5f, 0.5f, 0.5f);
+		ModelMatrix.main.setShaderMatrix();
+		BoxGraphic.drawSolidCube();
+		ModelMatrix.main.popMatrix();
 	}
 
 	@Override

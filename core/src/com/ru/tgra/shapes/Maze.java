@@ -1,6 +1,5 @@
 package com.ru.tgra.shapes;
 
-import java.util.ArrayList;
 
 public class Maze implements GameObject {
 	
@@ -29,10 +28,11 @@ public class Maze implements GameObject {
 				cells[x][z].draw();
 		}
 		
-		drawFloor();
+		//drawFloor();
 	}
 
 	private void drawFloor(){
+		//Gdx.gl.glUniform4f(colorLoc, 0.6f, 0.8f, 0.1f, 1.0f);
 		float x = cells[0].length * Cell.length / 2;
 		float z = cells[0].length * Cell.width / 2;
 		ModelMatrix.main.addTranslation(x - 1, -0.5f, z - 1);
@@ -42,4 +42,5 @@ public class Maze implements GameObject {
 		BoxGraphic.drawSolidCube();
 		ModelMatrix.main.popMatrix();
 	}
+
 }
