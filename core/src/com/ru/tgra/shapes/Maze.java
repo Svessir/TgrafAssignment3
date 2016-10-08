@@ -1,5 +1,7 @@
 package com.ru.tgra.shapes;
 
+import java.util.ArrayList;
+
 public class Maze implements GameObject {
 	
 	private final Cell[][] cells;
@@ -10,7 +12,7 @@ public class Maze implements GameObject {
 	}
 	
 	public void draw() {
-		ModelMatrix.main.pushMatrix();
+		/*ModelMatrix.main.pushMatrix();
 		for(int x = 0; x < cells.length; x++) {
 			ModelMatrix.main.pushMatrix();
 			for(int z = 0; z < cells[0].length; z++) {
@@ -20,6 +22,11 @@ public class Maze implements GameObject {
 			ModelMatrix.main.popMatrix();
 			ModelMatrix.main.addTranslation(Cell.width, 0, 0);
 		}
-		ModelMatrix.main.popMatrix();
+		ModelMatrix.main.popMatrix();*/
+		
+		for(int x = 0; x < cells.length; x++) {
+			for(int z = 0; z < cells[0].length; z++)
+				cells[x][z].draw();
+		}
 	}
 }

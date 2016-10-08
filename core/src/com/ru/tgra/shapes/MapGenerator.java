@@ -49,6 +49,7 @@ public class MapGenerator {
             }
         }
         curvePath();
+        createWalls();
         return cells;
     }
 
@@ -133,5 +134,24 @@ public class MapGenerator {
     
     private void markAsVisited(int x, int z) {
         visited[x][z] = true;
+    }
+    
+    public void createWalls() {
+    	float halfCellWidth = Cell.width/2.0f;
+    	float halfCellLength = Cell.height/2.0f;
+    	float wallThickness = 0.2f;
+    	
+    	for(int x = 0; x < cells.length; x++) {
+    		for(int z = 0; z < cells[0].length; z++) {
+    			if(cells[x][z].left) {
+    				cells[x][z].leftWall = new Wall(new Point3D(x - halfCellWidth, 0, z), 
+    						wallThickness, Cell.height);
+    			}
+    			if(cells[x][z].bottom) {
+    				cells[x][z].bottomWall = new Wall(new Point3D(x, 0, z - halfCellLength), 
+    						Cell.width, wallThickness);
+    			}
+    		}
+    	}
     }
 }

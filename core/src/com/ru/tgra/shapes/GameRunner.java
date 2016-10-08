@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.BufferUtils;
 
 public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
-	private FloatBuffer matrixBuffer;
-
 	private int renderingProgramID;
 	private int vertexShaderID;
 	private int fragmentShaderID;
@@ -33,6 +31,15 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	int size = 10;
 	
 	Maze maze;
+	
+	private static GameRunner instance = new GameRunner();
+	
+	private GameRunner() {
+	}
+	
+	public static GameRunner getInstance() {
+		return instance;
+	}
 
 	@Override
 	public void create () {
@@ -75,21 +82,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		Gdx.gl.glUseProgram(renderingProgramID);
 
-		//OrthographicProjection3D(0, Gdx.graphics.getWidth(), 0, Gdx.graphics.getHeight(), -1, 1);
-/*
-		float[] mm = new float[16];
-
-		mm[0] = 1.0f; mm[4] = 0.0f; mm[8] = 0.0f; mm[12] = 0.0f;
-		mm[1] = 0.0f; mm[5] = 1.0f; mm[9] = 0.0f; mm[13] = 0.0f;
-		mm[2] = 0.0f; mm[6] = 0.0f; mm[10] = 1.0f; mm[14] = 0.0f;
-		mm[3] = 0.0f; mm[7] = 0.0f; mm[11] = 0.0f; mm[15] = 1.0f;
-
-		modelMatrixBuffer = BufferUtils.newFloatBuffer(16);
-		modelMatrixBuffer.put(mm);
-		modelMatrixBuffer.rewind();
-
-		Gdx.gl.glUniformMatrix4fv(modelMatrixLoc, 1, false, modelMatrixBuffer);
-*/
 		//COLOR IS SET HERE
 		Gdx.gl.glUniform4f(colorLoc, 0.7f, 0.2f, 0, 1);
 
@@ -106,10 +98,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-		//OrthographicProjection3D(-2, 2, -2, 2, 1, 100);
-		//perspctiveProjection3D();
 		cam = new Camera(viewMatrixLoc, projectionMatrixLoc);
-		cam.Look3D(new Point3D(0.0f, 10f, 10.0f), new Point3D(0,3,0), new Vector3D(0,1,0));
+		cam.Look3D(new Point3D(2, 0, 5), new Point3D(0,0,0), new Vector3D(0,1,0));
 		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
 		cam.setShaderMatrices();
 		maze = new Maze(size);
@@ -123,36 +113,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 	private void update()
 	{
-		float deltaTime = Gdx.graphics.getDeltaTime();
-
-		//cam.Look3D(new Point3D(0.0f, cubeElevation, 2.0f), new Point3D(0,0,0), new Vector3D(0,1,0));
-
-
-		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			cam.yawIgnoreY(90.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			cam.yawIgnoreY(-90.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			cam.pitch(-90.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			cam.pitch(90.0f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			cam.slide(-2.5f * deltaTime, 0, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-			cam.slide(2.5f * deltaTime, 0, 0);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-			cam.slide(0, 0, -2.5f * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-			cam.slide(0, 0, 2.5f * deltaTime);
-		}
-		//do all updates to the game
+		float deltatime = Gdx.graphics.getDeltaTime();
+		cam.update(deltatime);
 	}
 
 
@@ -160,9 +122,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glUniform4f(colorLoc, 0.9f, 0.3f, 0.1f, 1.0f);
-		//cam.setShaderMatrix();
 		cam.setShaderMatrices();
-		//perspctiveProjection3D();
 		ModelMatrix.main.loadIdentityMatrix();
 		
 		
@@ -171,64 +131,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public void render () {
-
-		//input();
-		//put the code inside the update and display methods, depending on the nature of the code
 		update();
 		display();
-
-	}
-
-	private void Look3D(Point3D eye, Point3D center, Vector3D up) {
-
-		Vector3D n = Vector3D.difference(eye, center);
-		Vector3D u = up.cross(n);
-		n.normalize();
-		u.normalize();
-		Vector3D v = n.cross(u);
-
-		Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
-
-		float[] pm = new float[16];
-
-		pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
-		pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
-		pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(viewMatrixLoc, 1, false, matrixBuffer);
-	}
-
-	/*private void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
-		float[] pm = new float[16];
-
-		pm[0] = 2.0f / (right - left); pm[4] = 0.0f; pm[8] = 0.0f; pm[12] = -(right + left) / (right - left);
-		pm[1] = 0.0f; pm[5] = 2.0f / (top - bottom); pm[9] = 0.0f; pm[13] = -(top + bottom) / (top - bottom);
-		pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = 2.0f / (near - far); pm[14] = (near + far) / (near - far);
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(projectionMatrixLoc, 1, false, matrixBuffer);
-	}*/
-
-	private void perspctiveProjection3D() {
-		float[] pm = new float[16];
-
-		pm[0] = 1.0f; pm[4] = 0.0f; pm[8] = 0.0f; pm[12] = 0.0f;
-		pm[1] = 0.0f; pm[5] = 1.0f; pm[9] = 0.0f; pm[13] = 0.0f;
-		pm[2] = 0.0f; pm[6] = 0.0f; pm[10] = -1.02f; pm[14] = -2.02f;
-		pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = -1.0f; pm[15] = 0.0f;
-
-		matrixBuffer = BufferUtils.newFloatBuffer(16);
-		matrixBuffer.put(pm);
-		matrixBuffer.rewind();
-		Gdx.gl.glUniformMatrix4fv(projectionMatrixLoc, 1, false, matrixBuffer);
-
 	}
 
 	@Override
@@ -278,6 +182,5 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 }

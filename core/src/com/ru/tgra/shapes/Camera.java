@@ -1,29 +1,34 @@
 package com.ru.tgra.shapes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.BufferUtils;
 
 import java.nio.FloatBuffer;
 
 /**
- * Created by KÃ¡rii on 22.9.2016.
+ * Created by Kári on 22.9.2016.
  */
-public class Camera {
-    Vector3D n;
-    Vector3D u;
-    Vector3D v;
-    public Point3D eye;
-
+public class Camera extends AbstractGameObject {
+    private Vector3D n;
+    private Vector3D u;
+    private Vector3D v;
+    private Point3D eye;
+    
     private boolean orthographic;
 
-    float left;
-    float right;
-    float bottom;
-    float top;
-    float near;
-    float far;
+    private float left;
+    private float right;
+    private float bottom;
+    private float top;
+    private float near;
+    private float far;
 
-
+    private Vector3D velocity;
+    private final float speed = 2.5f;
+    private final float rotationPerSecond = 90f;
+    private final float cameraRadius = 0.1f;
+    
     private int viewMatrixPointer;
     private FloatBuffer matrixBuffer;
     private int projectionMatrixPointer;
@@ -138,22 +143,7 @@ public class Camera {
         n.z = v.z * (-s) + n.z * c;
         v.z = tmp;
     }
-/*
-    public void setShaderMatrix(){
-        Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
-
-        float[] pm = new float[16];
-        pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
-        pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
-        pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
-        pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-        matrixBuffer = BufferUtils.newFloatBuffer(16);
-        matrixBuffer.put(pm);
-        matrixBuffer.rewind();
-        Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
-    }
-*/
+    
     public void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
         this.left = left;
         this.right = right;
@@ -211,5 +201,38 @@ public class Camera {
         Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
 
     }
+    
+    public void update(float deltatime) {
+    	input(deltatime);
+    	updateVelocityAfterCollision();
+    	slide(velocity.x, velocity.y, velocity.z);
+    }
+    
+    private void input(float deltaTime) {
+    	velocity = new Vector3D(0,0,0);
+    	
+    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			yawIgnoreY(90.0f * deltaTime);
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			yawIgnoreY(-90.0f * deltaTime);
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+			velocity.x -= speed *deltaTime;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+			velocity.x += speed *deltaTime;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+			velocity.z -= speed *deltaTime;
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+			velocity.z += speed *deltaTime;
+		}
+    }
+
+	@Override
+	public void draw() {
+	}
 
 }

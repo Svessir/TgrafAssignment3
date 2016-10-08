@@ -9,6 +9,9 @@ public class Cell implements GameObject{
     public static final float width = 1f;
     public static final float height = 1f;
     
+    public Wall leftWall;
+    public Wall bottomWall;
+    
     public Cell() {
         left = true;
         bottom = true;
@@ -20,7 +23,7 @@ public class Cell implements GameObject{
     }
     
     public void draw() {
-    	float translationX = width / 2.0f;
+    	/*float translationX = width / 2.0f;
     	float translationZ = height / 2.0f;
     	
     	if (left) {
@@ -39,6 +42,11 @@ public class Cell implements GameObject{
 	    	ModelMatrix.main.setShaderMatrix();
 	    	BoxGraphic.drawSolidCube();
 	    	ModelMatrix.main.popMatrix();
-    	}
+    	}*/
+    	
+    	if(left)
+    		this.leftWall.draw();
+    	if(bottom)
+    		this.bottomWall.draw();
     }
 }
