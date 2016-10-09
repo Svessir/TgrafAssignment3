@@ -31,7 +31,7 @@ public class Maze implements GameObject {
 		//drawFloor();
 	}
 
-	private void drawFloor(){
+/*	private void drawFloor(){
 		//Gdx.gl.glUniform4f(colorLoc, 0.6f, 0.8f, 0.1f, 1.0f);
 		float x = cells[0].length * Cell.length / 2;
 		float z = cells[0].length * Cell.width / 2;
@@ -41,6 +41,6 @@ public class Maze implements GameObject {
 		ModelMatrix.main.setShaderMatrix();
 		BoxGraphic.drawSolidCube();
 		ModelMatrix.main.popMatrix();
-	}
+	}*/
 
 }

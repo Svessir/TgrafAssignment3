@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 import java.nio.FloatBuffer;
 
 /**
- * Created by Kári on 22.9.2016.
+ * Created by Kari on 22.9.2016.
  */
 public class Camera extends AbstractGameObject {
     private Vector3D n;
@@ -28,14 +28,10 @@ public class Camera extends AbstractGameObject {
     private final float speed = 1.1f;
     private final float rotationPerSecond = 60f;
     private final float cameraRadius = 0.1f;
-    
-    private int viewMatrixPointer;
-    private FloatBuffer matrixBuffer;
-    private int projectionMatrixPointer;
 
-    public Camera(int viewMatixPointer, int projectionMatrixPointer){
-        this.viewMatrixPointer = viewMatixPointer;
-        this.projectionMatrixPointer = projectionMatrixPointer;
+    private FloatBuffer matrixBuffer;
+
+    public Camera(){
         matrixBuffer = BufferUtils.newFloatBuffer(16);
 
         eye = new Point3D();
@@ -165,7 +161,25 @@ public class Camera extends AbstractGameObject {
         orthographic = false;
     }
 
-    public void setShaderMatrices(){
+    public FloatBuffer getViewMatrix(){
+        float[] pm = new float[16];
+
+        Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
+
+        pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
+        pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
+        pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
+        pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
+
+
+        matrixBuffer = BufferUtils.newFloatBuffer(16);
+        matrixBuffer.put(pm);
+        matrixBuffer.rewind();
+
+        return matrixBuffer;
+    }
+
+    public FloatBuffer getProjectionMatrix(){
         float[] pm = new float[16];
 
         if(orthographic){
@@ -185,30 +199,17 @@ public class Camera extends AbstractGameObject {
         matrixBuffer = BufferUtils.newFloatBuffer(16);
         matrixBuffer.put(pm);
         matrixBuffer.rewind();
-        Gdx.gl.glUniformMatrix4fv(projectionMatrixPointer, 1, false, matrixBuffer);
 
-        Vector3D minusEye = new Vector3D(-eye.x, -eye.y, -eye.z);
-
-        pm[0] = u.x; pm[4] = u.y; pm[8] = u.z; pm[12] = minusEye.dot(u);
-        pm[1] = v.x; pm[5] = v.y; pm[9] = v.z; pm[13] = minusEye.dot(v);
-        pm[2] = n.x; pm[6] = n.y; pm[10] = n.z; pm[14] = minusEye.dot(n);
-        pm[3] = 0.0f; pm[7] = 0.0f; pm[11] = 0.0f; pm[15] = 1.0f;
-
-
-        matrixBuffer = BufferUtils.newFloatBuffer(16);
-        matrixBuffer.put(pm);
-        matrixBuffer.rewind();
-        Gdx.gl.glUniformMatrix4fv(viewMatrixPointer, 1, false, matrixBuffer);
-
+        return matrixBuffer;
     }
-    
+
     public void update(float deltatime) {
     	input(deltatime);
     	updateVelocityAfterCollision();
     	slide(velocity.x, velocity.y, velocity.z);
     }
     
-    private void input(float deltaTime) {
+    /*private void input(float deltaTime) {
     	velocity = new Vector3D(0,0,0);
     	
     	if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -229,6 +230,35 @@ public class Camera extends AbstractGameObject {
 		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
 			velocity.z += speed *deltaTime;
 		}
+    }*/
+
+    private void input(float deltaTime) {
+        velocity = new Vector3D(0,0,0);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            yaw(rotationPerSecond * deltaTime);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            yaw(-rotationPerSecond * deltaTime);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            pitch(rotationPerSecond * deltaTime);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            pitch(-rotationPerSecond * deltaTime);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+            velocity.x -= speed *deltaTime;
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+            velocity.x += speed *deltaTime;
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+            velocity.z -= speed *deltaTime;
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+            velocity.z += speed *deltaTime;
+        }
     }
 
 	@Override
