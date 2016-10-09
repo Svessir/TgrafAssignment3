@@ -1,9 +1,12 @@
 package com.ru.tgra.shapes;
 
 
+import java.util.ArrayList;
+
 public class Maze implements GameObject {
 	
 	private final Cell[][] cells;
+	private Wall wall = new Wall(new Point3D(3,0,5), Cell.width * 0.2f, Cell.length);
 	
 	public Maze(int size) {
 		MapGenerator mapGenerator = new MapGenerator();
@@ -23,12 +26,24 @@ public class Maze implements GameObject {
 		}
 		ModelMatrix.main.popMatrix();*/
 		
-		for(int x = 0; x < cells.length; x++) {
+		/*for(int x = 0; x < cells.length; x++) {
 			for(int z = 0; z < cells[0].length; z++)
 				cells[x][z].draw();
-		}
+		}*/
+		wall.draw();
 		
 		//drawFloor();
+	}
+
+	public ArrayList<CollisionEdge> getCollisionEdges(){
+		ArrayList<CollisionEdge> edges = new ArrayList<CollisionEdge>();
+		/*for(int x = 0; x < cells.length; x++){
+			for(int z = 0; z < cells[0].length; z++){
+				cells[x][z].addCollisionEdges(edges);
+			}
+		}*/
+		wall.addCollisionEdges(edges);
+		return edges;
 	}
 
 /*	private void drawFloor(){

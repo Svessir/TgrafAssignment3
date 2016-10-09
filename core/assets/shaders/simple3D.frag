@@ -22,6 +22,8 @@ void main()
     vec4 specularColor = pow(phong, u_materialShininess) * u_lightColor * u_materialSpecular;
 
     vec4 lightColor1 = diffuseColor + specularColor;
-    gl_FragColor = u_globalAmbient + u_materialDiffuse + lightColor1;
+
+    gl_FragColor = u_globalAmbient + lightColor1;
+    //gl_FragColor = u_globalAmbient + u_materialDiffuse + lightColor1;
 
 }

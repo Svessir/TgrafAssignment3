@@ -24,7 +24,6 @@ public class Camera extends AbstractGameObject {
     private float near;
     private float far;
 
-    private Vector3D velocity;
     private final float speed = 1.1f;
     private final float rotationPerSecond = 60f;
     private final float cameraRadius = 0.1f;
@@ -34,6 +33,7 @@ public class Camera extends AbstractGameObject {
     public Camera(){
         matrixBuffer = BufferUtils.newFloatBuffer(16);
 
+        objectRadius = 0.1f;
         eye = new Point3D();
         u = new Vector3D(1,0,0);
         v = new Vector3D(0,1,0);
@@ -205,8 +205,9 @@ public class Camera extends AbstractGameObject {
 
     public void update(float deltatime) {
     	input(deltatime);
-    	updateVelocityAfterCollision();
-    	slide(velocity.x, velocity.y, velocity.z);
+        //System.out.println("Velocity = " + velocity.x + " " + velocity.y + " " + velocity.z);
+        updateVelocityAfterCollision(new CollisionVertex(eye, velocity, objectRadius), deltatime);
+    	slide(velocity.x * deltatime, velocity.y * deltatime, velocity.z * deltatime);
     }
     
     /*private void input(float deltaTime) {
@@ -234,30 +235,29 @@ public class Camera extends AbstractGameObject {
 
     private void input(float deltaTime) {
         velocity = new Vector3D(0,0,0);
-
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            yaw(rotationPerSecond * deltaTime);
+            yawIgnoreY(rotationPerSecond * deltaTime);
         }
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            yaw(-rotationPerSecond * deltaTime);
+            yawIgnoreY(-rotationPerSecond * deltaTime);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        /*if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
             pitch(rotationPerSecond * deltaTime);
         }
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             pitch(-rotationPerSecond * deltaTime);
-        }
+        }*/
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            velocity.x -= speed *deltaTime;
+            velocity.x -= speed;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-            velocity.x += speed *deltaTime;
+            velocity.x += speed;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-            velocity.z -= speed *deltaTime;
+            velocity.z -= speed;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            velocity.z += speed *deltaTime;
+            velocity.z += speed;
         }
     }
 

@@ -16,8 +16,17 @@ public class Wall implements GameObject {
 		shader = new Shader();
 	}
 	
-	public ArrayList<CollisionEdge> getCollisionEdges() {
-		return new ArrayList<CollisionEdge>();
+	public void addCollisionEdges(ArrayList<CollisionEdge> collisionEdges) {
+		float halfWidth = width / 2.0f;
+		float halfLength = length / 2.0f;
+		Point3D leftTop = new Point3D(center.x - halfWidth, 0, center.z + halfLength);
+		Point3D leftBottom = new Point3D(center.x - halfWidth, 0, center.z - halfLength);
+		Point3D rightTop = new Point3D(center.x + halfWidth, 0, center.z + halfLength);
+		Point3D rightBottom = new Point3D(center.x + halfWidth, 0, center.z - halfLength);
+		collisionEdges.add(new CollisionEdge(leftTop, leftBottom));
+		collisionEdges.add(new CollisionEdge(leftTop, rightTop));
+		collisionEdges.add(new CollisionEdge(leftBottom, rightBottom));
+		collisionEdges.add(new CollisionEdge(rightTop, rightBottom));
 	}
 
 	@Override

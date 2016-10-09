@@ -1,5 +1,7 @@
 package com.ru.tgra.shapes;
 
+import java.util.ArrayList;
+
 /**
  * Created by Sverrir on 6.10.2016.
  */
@@ -49,5 +51,12 @@ public class Cell implements GameObject{
     		this.leftWall.draw();
     	if(bottom)
     		this.bottomWall.draw();
+    }
+
+    public void addCollisionEdges(ArrayList<CollisionEdge> collisionEdges) {
+        if(left)
+            leftWall.addCollisionEdges(collisionEdges);
+        if(bottom)
+            bottomWall.addCollisionEdges(collisionEdges);
     }
 }

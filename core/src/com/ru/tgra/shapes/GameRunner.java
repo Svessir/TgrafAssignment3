@@ -3,17 +3,11 @@ package com.ru.tgra.shapes;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 
-import java.nio.FloatBuffer;
-
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BufferUtils;
-import com.sun.prism.MeshView;
-
+import java.util.ArrayList;
+import java.util.Collections;
 public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 	private Shader shader;
@@ -22,7 +16,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	private MovingObject movingObject;
 	private MovingObject light;
 
-	int size = 20;
+	int size = 10;
 
 	Maze maze;
 
@@ -59,14 +53,14 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
 		cam = new Camera();
-		cam.Look3D(new Point3D(2, 0, 5), new Point3D(0,0,0), new Vector3D(0,1,0));
+		cam.Look3D(new Point3D(5, 0, 2), new Point3D(0,0,0), new Vector3D(0,1,0));
 		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
 		maze = new Maze(size);
 		orthoCam = new Camera();
 		orthoCam.OrthographicProjection3D(-size, size, -size, size, 0.4f, 1000);
-		movingObject = new MovingObject(5, 5, 5, 0.3f);
+		movingObject = new MovingObject(5, 0, 5, 0.3f);
 		light = new MovingObject(10, 10, 10, 0.1f);
 
 
@@ -78,7 +72,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		cam.update(deltatime);
 		movingObject.update(deltatime);
 	}
-
 
 	private void display()
 	{
@@ -116,6 +109,24 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		shader.setModelMatrix(ModelMatrix.main.getMatrix());
 		BoxGraphic.drawSolidCube();
 		ModelMatrix.main.popMatrix();
+	}
+
+	public Collision getCollision(CollisionVertex vertex, float deltaTime){
+		Collision latestCollision = null;
+		ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges();
+		ArrayList<Collision> collisions = new ArrayList<Collision>();
+		for (CollisionEdge edge : collisionEdges) {
+			Collision collision = edge.getCollision(vertex, deltaTime);
+			if (collision != null)
+				collisions.add(collision);
+		}
+		System.out.println(collisions.size());
+		Collections.sort(collisions, Collision.tHitComparator);
+		if(!collisions.isEmpty()) {
+			latestCollision = collisions.get(0);
+			vertex.setVelocity(latestCollision.newTravelVector);
+		}
+		return latestCollision;
 	}
 
 	@Override

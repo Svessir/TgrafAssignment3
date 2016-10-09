@@ -1,31 +1,57 @@
 package com.ru.tgra.shapes;
 
-import com.badlogic.gdx.math.Vector3;
-
 public class CollisionEdge {
 	public final Point3D point1;
 	public final Point3D point2;
-	public final Vector3 normal;
-	
-	public CollisionEdge(Point3D point1, Point3D point2) {
+	public final Vector3D normal;
+
+	public CollisionEdge(Point3D point1, Point3D point2){
 		this.point1 = point1;
 		this.point2 = point2;
-		this.normal = new Vector3(-(this.point2.y - this.point1.y), this.point2.x - this.point1.x, 0.0f);
-		this.normal.nor();
+		this.normal = new Vector3D(-(point2.z - point1.z), 0.0f ,(point2.x - point1.x));
+		this.normal.normalize();
 	}
-	
-	public Collision getCollision(Vector3 vertex, Vector3 velocity, float deltatime) {
-		float time_hit = normal.dot(new Vector3(point1.x - vertex.x, point1.y - vertex.y, 0)) 
-				/ normal.dot(velocity);
-		
-		float col_x = vertex.x + velocity.x * time_hit;
-		float col_y = vertex.y + velocity.y * time_hit;
-		
-		if(Float.isNaN(time_hit) || Float.isInfinite(time_hit) || time_hit < 0 || time_hit > deltatime ||
-				col_x < Math.min(point1.x, point2.x) || col_x > Math.max(point1.x, point2.x) || 
-				col_y < Math.min(point1.y, point2.y) || col_y > Math.max(point1.y, point2.y))
-			return null;
-		
-		return null;
+
+	public Collision getCollision(CollisionVertex vertex, float deltaTime){
+		Point3D vertexPoint = vertex.getVertex();
+		Vector3D velocityVector = vertex.getVelocity();
+		float tHit1 = normal.dot(new Vector3D(point1.x - vertexPoint.x, 0.0f, point1.z - vertexPoint.z));
+		float tHit2 = normal.dot(velocityVector);
+		float tHit = tHit1/ tHit2;
+		System.out.println("VertexPoint : " + vertexPoint.x + " " + vertexPoint.y + " " + vertexPoint.z);
+		System.out.println("tHi1: " + tHit1);
+		System.out.println("tHi2: " + tHit2);
+		System.out.println("tHIT: " + tHit);
+		float col_x = vertexPoint.x + velocityVector.x * tHit;
+		float col_z = vertexPoint.z + velocityVector.z * tHit;
+
+		if(Float.isNaN(tHit) || Float.isInfinite(tHit) || tHit < 0 || tHit > deltaTime
+				|| col_x < Math.min(point1.x, point2.x) || col_x > Math.max(point1.x, point2.x)
+				|| col_z < Math.min(point1.z, point2.z) || col_z > Math.max(point1.z, point2.z)){
+				return null;
+		}
+		Vector3D reflectionVector = getReflectionVector(velocityVector);
+		Vector3D newTravelVector = null;
+
+		if(velocityVector.x >= 0 && reflectionVector.x < 0){
+			newTravelVector = new Vector3D(col_x - vertex.getRadius(), velocityVector.y, velocityVector.z);
+		}
+		else if(velocityVector.x < 0 && reflectionVector.x >= 0){
+			newTravelVector = new Vector3D(col_x + vertex.getRadius(), velocityVector.y, velocityVector.z);
+		}
+		else if(velocityVector.z >= 0 && reflectionVector.z < 0){
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertex.getRadius());
+		}
+		else{
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z + vertex.getRadius());
+		}
+		System.out.println("Returns");
+		return new Collision(new Vector3D(0,0,0), tHit);
+	}
+
+	private Vector3D getReflectionVector(Vector3D velocity){
+		float b = 2 * velocity.dot(normal);
+		Vector3D c = new Vector3D(b * normal.x, 0, b * normal.z);
+		return new Vector3D(velocity.x - c.x, 0, velocity.z - c.z);
 	}
 }
