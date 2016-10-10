@@ -54,7 +54,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		cam = new Camera();
 		cam.Look3D(new Point3D(5, 0, 2), new Point3D(0,0,0), new Vector3D(0,1,0));
-		cam.PerspctiveProjection3D(90, 2, 0.01f, 100);
+		cam.PerspctiveProjection3D(90, 2, 0.001f, 100);
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
 		maze = new Maze(size);
@@ -76,7 +76,7 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	private void display()
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		shader.setLightPosition(10.0f, 10.0f, 10.0f, 1.0f);
+		shader.setLightPosition(12.0f, 7.0f, 10.0f, 1.0f);
 		shader.setLightColor(0.0f, 1.0f, 1.0f, 1.0f);
 
 		shader.setGlobalAmbient(0.1f, 0.1f, 0.1f, 1.0f);
@@ -111,21 +111,25 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		ModelMatrix.main.popMatrix();
 	}
 
-	public Collision getCollision(CollisionVertex vertex, float deltaTime){
+	public Collision getCollision(CollisionVertex vertex){
+
 		Collision latestCollision = null;
-		ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges();
-		ArrayList<Collision> collisions = new ArrayList<Collision>();
-		for (CollisionEdge edge : collisionEdges) {
-			Collision collision = edge.getCollision(vertex, deltaTime);
-			if (collision != null)
-				collisions.add(collision);
-		}
-		System.out.println(collisions.size());
-		Collections.sort(collisions, Collision.tHitComparator);
-		if(!collisions.isEmpty()) {
-			latestCollision = collisions.get(0);
-			vertex.setVelocity(latestCollision.newTravelVector);
-		}
+		do {
+			ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges();
+			ArrayList<Collision> collisions = new ArrayList<Collision>();
+			for (CollisionEdge edge : collisionEdges) {
+				Collision collision = edge.getCollision(vertex);
+				if (collision != null)
+					collisions.add(collision);
+			}
+			//System.out.println(collisions.size());
+			Collections.sort(collisions, Collision.tHitComparator);
+			if(!collisions.isEmpty()) {
+				latestCollision = collisions.get(0);
+				vertex.setVelocity(latestCollision.newTravelVector);
+			}
+			else break;
+		}while(true);
 		return latestCollision;
 	}
 

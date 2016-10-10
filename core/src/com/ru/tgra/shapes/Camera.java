@@ -26,7 +26,6 @@ public class Camera extends AbstractGameObject {
 
     private final float speed = 1.1f;
     private final float rotationPerSecond = 60f;
-    private final float cameraRadius = 0.1f;
 
     private FloatBuffer matrixBuffer;
 
@@ -60,9 +59,12 @@ public class Camera extends AbstractGameObject {
 
 
     public void slide(float delU, float delV, float delN){
-        eye.x += delU * u.x + delV * v.x + delN * n.x;
-        eye.y += delU * u.y + delV * v.y + delN * n.y;
-        eye.z += delU * u.z + delV * v.z + delN * n.z;
+        //eye.x += delU * u.x + delV * v.x + delN * n.x;
+        //eye.y += delU * u.y + delV * v.y + delN * n.y;
+        //eye.z += delU * u.z + delV * v.z + delN * n.z;
+        eye.x += delU;
+        eye.y += delV;
+        eye.z += delN;
     }
 
     public void roll(float angle){
@@ -206,8 +208,8 @@ public class Camera extends AbstractGameObject {
     public void update(float deltatime) {
     	input(deltatime);
         //System.out.println("Velocity = " + velocity.x + " " + velocity.y + " " + velocity.z);
-        updateVelocityAfterCollision(new CollisionVertex(eye, velocity, objectRadius), deltatime);
-    	slide(velocity.x * deltatime, velocity.y * deltatime, velocity.z * deltatime);
+        updateVelocityAfterCollision(new CollisionVertex(eye, velocity, objectRadius));
+    	slide(velocity.x, velocity.y, velocity.z);
     }
     
     /*private void input(float deltaTime) {
@@ -248,18 +250,31 @@ public class Camera extends AbstractGameObject {
             pitch(-rotationPerSecond * deltaTime);
         }*/
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            velocity.x -= speed;
+            velocity.x -= speed * deltaTime;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-            velocity.x += speed;
+            velocity.x += speed  * deltaTime;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-            velocity.z -= speed;
+            velocity.z -= speed  * deltaTime;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            velocity.z += speed;
+            velocity.z += speed  * deltaTime;
         }
+
+        Vector3D oldVelocity = velocity;
+        velocity = new Vector3D(0,0,0);
+        velocity.x = oldVelocity.x * u.x + oldVelocity.y * v.x + oldVelocity.z * n.x;
+        velocity.z = oldVelocity.x * u.z + oldVelocity.y * v.z + oldVelocity.z * n.z;
     }
+
+    /*
+        public void slide(float delU, float delV, float delN){
+        eye.x += delU * u.x + delV * v.x + delN * n.x;
+        eye.y += delU * u.y + delV * v.y + delN * n.y;
+        eye.z += delU * u.z + delV * v.z + delN * n.z;
+    }
+     */
 
 	@Override
 	public void draw() {

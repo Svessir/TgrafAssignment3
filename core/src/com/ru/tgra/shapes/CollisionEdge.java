@@ -12,20 +12,15 @@ public class CollisionEdge {
 		this.normal.normalize();
 	}
 
-	public Collision getCollision(CollisionVertex vertex, float deltaTime){
+	public Collision getCollision(CollisionVertex vertex){
 		Point3D vertexPoint = vertex.getVertex();
 		Vector3D velocityVector = vertex.getVelocity();
-		float tHit1 = normal.dot(new Vector3D(point1.x - vertexPoint.x, 0.0f, point1.z - vertexPoint.z));
-		float tHit2 = normal.dot(velocityVector);
-		float tHit = tHit1/ tHit2;
-		System.out.println("VertexPoint : " + vertexPoint.x + " " + vertexPoint.y + " " + vertexPoint.z);
-		System.out.println("tHi1: " + tHit1);
-		System.out.println("tHi2: " + tHit2);
-		System.out.println("tHIT: " + tHit);
+		float tHit = normal.dot(new Vector3D(point1.x - vertexPoint.x, 0.0f, point1.z - vertexPoint.z))/ normal.dot(velocityVector);
+
 		float col_x = vertexPoint.x + velocityVector.x * tHit;
 		float col_z = vertexPoint.z + velocityVector.z * tHit;
 
-		if(Float.isNaN(tHit) || Float.isInfinite(tHit) || tHit < 0 || tHit > deltaTime
+		if(Float.isNaN(tHit) || Float.isInfinite(tHit) || tHit < 0 || tHit > 1
 				|| col_x < Math.min(point1.x, point2.x) || col_x > Math.max(point1.x, point2.x)
 				|| col_z < Math.min(point1.z, point2.z) || col_z > Math.max(point1.z, point2.z)){
 				return null;
@@ -33,20 +28,29 @@ public class CollisionEdge {
 		Vector3D reflectionVector = getReflectionVector(velocityVector);
 		Vector3D newTravelVector = null;
 
+		System.out.println("vertexrRad: "+ vertex.getRadius());
+		System.out.println("colX: "+ col_x);
+		System.out.println("colZ: "+ col_z);
+
 		if(velocityVector.x >= 0 && reflectionVector.x < 0){
-			newTravelVector = new Vector3D(col_x - vertex.getRadius(), velocityVector.y, velocityVector.z);
+			System.out.println("col_x - vertex.getRadius()= " + (col_x - vertex.getRadius()));
+			newTravelVector = new Vector3D(col_x - vertex.getRadius() - vertexPoint.x, velocityVector.y, velocityVector.z);
 		}
 		else if(velocityVector.x < 0 && reflectionVector.x >= 0){
-			newTravelVector = new Vector3D(col_x + vertex.getRadius(), velocityVector.y, velocityVector.z);
+			System.out.println("col_x + vertex.getRadius()= " + (col_x + vertex.getRadius()));
+			newTravelVector = new Vector3D(col_x + vertex.getRadius() - vertexPoint.x, velocityVector.y, velocityVector.z);
 		}
 		else if(velocityVector.z >= 0 && reflectionVector.z < 0){
-			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertex.getRadius());
+			System.out.println("col_z - vertex.getRadius()= " + (col_z - vertex.getRadius()));
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertex.getRadius() - vertexPoint.z);
 		}
 		else{
-			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z + vertex.getRadius());
+			System.out.println("col_z + vertex.getRadius()= " + (col_z + vertex.getRadius()));
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z + vertex.getRadius() - vertexPoint.z);
 		}
-		System.out.println("Returns");
-		return new Collision(new Vector3D(0,0,0), tHit);
+
+		System.out.println("velocity " + velocityVector + ", newVelocity: " + newTravelVector);
+		return new Collision(newTravelVector, tHit);
 	}
 
 	private Vector3D getReflectionVector(Vector3D velocity){

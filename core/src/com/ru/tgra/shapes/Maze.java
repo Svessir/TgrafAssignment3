@@ -26,23 +26,23 @@ public class Maze implements GameObject {
 		}
 		ModelMatrix.main.popMatrix();*/
 		
-		/*for(int x = 0; x < cells.length; x++) {
+		for(int x = 0; x < cells.length; x++) {
 			for(int z = 0; z < cells[0].length; z++)
 				cells[x][z].draw();
-		}*/
-		wall.draw();
+		}
+		//wall.draw();
 		
 		//drawFloor();
 	}
 
 	public ArrayList<CollisionEdge> getCollisionEdges(){
 		ArrayList<CollisionEdge> edges = new ArrayList<CollisionEdge>();
-		/*for(int x = 0; x < cells.length; x++){
+		for(int x = 0; x < cells.length; x++){
 			for(int z = 0; z < cells[0].length; z++){
 				cells[x][z].addCollisionEdges(edges);
 			}
-		}*/
-		wall.addCollisionEdges(edges);
+		}
+		//wall.addCollisionEdges(edges);
 		return edges;
 	}
 
