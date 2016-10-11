@@ -29,7 +29,7 @@ public class CollisionEdge {
 		}
 		Vector3D reflectionVector = getReflectionVector(velocityVector);
 		Vector3D newTravelVector = null;
-
+		
 		if(velocityVector.x >= 0 && reflectionVector.x < 0){
 			newTravelVector = new Vector3D(col_x - vertexPoint.x - 0.001f, velocityVector.y, velocityVector.z);
 		}
