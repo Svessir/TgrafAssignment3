@@ -54,13 +54,13 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		cam = new Camera();
 		cam.Look3D(new Point3D(5, 0, 2), new Point3D(0,0,0), new Vector3D(0,1,0));
-		cam.PerspctiveProjection3D(90, 16/9, 0.001f, 100);
+		cam.PerspctiveProjection3D(90, 16/9, 0.07f, 100);
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
 		maze = new Maze(size);
 		orthoCam = new Camera();
 		orthoCam.OrthographicProjection3D(-size, size, -size, size, 0.4f, 1000);
-		movingObject = new MovingObject(5, 0, 5, 0.3f);
+		movingObject = new MovingObject(5, 0, 5, 0.1f);
 	}
 
 	private void update()
@@ -104,13 +104,15 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		shader.setModelMatrix(ModelMatrix.main.getMatrix());
 		BoxGraphic.drawSolidCube();
 		ModelMatrix.main.popMatrix();
+		shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+		movingObject.draw();
 
 	}
 
 	private void setLightPositions(){
-		shader.setLightPosition(5.0f, 12.0f, 0.0f, 1.0f);
-		shader.setLight2Position(2.0f, 5.0f, 8.0f, 1.0f);
-		shader.setLight3Position(9.0f, 8.0f, 6.0f, 1.0f);
+		shader.setLightPosition(5.0f, 12.0f, -3.0f, 1.0f);
+		shader.setLight2Position(12.0f, 12.0f, 8.0f, 1.0f);
+		shader.setLight3Position(-3.0f, 12.0f, 12.0f, 1.0f);
 
 		shader.setLightDiffuse(0.4f, 0.1f, 0.1f, 1.0f);
 		shader.setLightSpecular(1.0f, 0.0f, 0.0f, 1.0f);
@@ -130,6 +132,11 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		Collision latestCollision = null;
 		ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges(vertex.getRadius());
+		if(vertex.caller != movingObject)
+			movingObject.addCollisionEdges(collisionEdges, vertex.getRadius());
+		if(vertex.caller != cam) {
+			cam.addCollisionEdges(collisionEdges, vertex.getRadius());
+		}
 		do {
 			ArrayList<Collision> collisions = new ArrayList<Collision>();
 			for (CollisionEdge edge : collisionEdges) {
@@ -137,7 +144,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 				if (collision != null)
 					collisions.add(collision);
 			}
-			//System.out.println(collisions.size());
 			Collections.sort(collisions, Collision.tHitComparator);
 			if(!collisions.isEmpty()) {
 				latestCollision = collisions.get(0);

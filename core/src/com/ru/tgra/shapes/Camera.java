@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.BufferUtils;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 /**
  * Created by Kari on 22.9.2016.
@@ -59,50 +60,9 @@ public class Camera extends AbstractGameObject {
 
 
     public void slide(float delU, float delV, float delN){
-        //eye.x += delU * u.x + delV * v.x + delN * n.x;
-        //eye.y += delU * u.y + delV * v.y + delN * n.y;
-        //eye.z += delU * u.z + delV * v.z + delN * n.z;
         eye.x += delU;
         eye.y += delV;
         eye.z += delN;
-    }
-
-    public void roll(float angle){
-        float radians = angle *(float)Math.PI/180.0f;
-        float c = (float)Math.cos(radians);
-        float s = (float)Math.sin(radians);
-        Vector3D t = new Vector3D(u.x, u.y, u.z);
-
-        u.x = t.x * c - v.x * s;
-        u.y = t.y * c - v.y * s;
-        u.z = t.z * c - v.z * s;
-        v.x = t.x * c + v.x * s;
-        v.y = t.y * c + v.y * s;
-        v.z = t.z * c + v.z * s;
-    }
-
-    public void slideIgnoreY(float delU, float delV, float delN){
-        eye.x += delU * u.x + delV * v.x + delN * n.x;
-        //eye.y += delU * u.y + delV * v.y + delN * n.y;
-        eye.z += delU * u.z + delV * v.z + delN * n.z;
-    }
-
-    public void yaw(float angle){
-        float c = (float)Math.cos((double)angle * Math.PI / 180.0);
-        float s = (float)Math.sin((double)angle * Math.PI / 180.0);
-        float tmp ;
-
-        tmp = c * u.x - s * n.x;
-        n.x = s * u.x + c * n.x;
-        u.x = tmp;
-
-        tmp = c * u.y - s * n.y;
-        n.y = s * u.y + c * n.y;
-        u.y = tmp;
-
-        tmp = c * u.z - s * n.z;
-        n.z = s * u.z + c * n.z;
-        u.z = tmp;
     }
 
     public void yawIgnoreY(float angle){
@@ -121,25 +81,6 @@ public class Camera extends AbstractGameObject {
         tmp = c * n.x + s * n.z;
         n.z = -s * n.x + c * n.z;
         n.x = tmp;
-    }
-
-    public void pitch(float angle) {
-        float c = (float) Math.cos((double) angle * Math.PI / 180.0);
-        float s = (float) Math.sin((double) angle * Math.PI / 180.0);
-
-        float tmp;
-
-        tmp = v.x * c + n.x * s;
-        n.x = v.x * (-s) + n.x * c;
-        v.x = tmp;
-
-        tmp = v.y * c + n.y * s;
-        n.y = v.y * (-s) + n.y * c;
-        v.y = tmp;
-
-        tmp = v.z * c + n.z * s;
-        n.z = v.z * (-s) + n.z * c;
-        v.z = tmp;
     }
     
     public void OrthographicProjection3D(float left, float right, float bottom, float top, float near, float far) {
@@ -207,33 +148,9 @@ public class Camera extends AbstractGameObject {
 
     public void update(float deltatime) {
     	input(deltatime);
-        //System.out.println("Velocity = " + velocity.x + " " + velocity.y + " " + velocity.z);
-        updateVelocityAfterCollision(new CollisionVertex(eye, velocity, objectRadius));
+        updateVelocityAfterCollision(new CollisionVertex(eye, velocity, objectRadius, this));
     	slide(velocity.x, velocity.y, velocity.z);
     }
-    
-    /*private void input(float deltaTime) {
-    	velocity = new Vector3D(0,0,0);
-    	
-    	if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			yawIgnoreY(rotationPerSecond * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			yawIgnoreY(-rotationPerSecond * deltaTime);
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-			velocity.x -= speed *deltaTime;
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.D)) {
-			velocity.x += speed *deltaTime;
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-			velocity.z -= speed *deltaTime;
-		}
-		if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-			velocity.z += speed *deltaTime;
-		}
-    }*/
 
     private void input(float deltaTime) {
         velocity = new Vector3D(0,0,0);
@@ -243,12 +160,6 @@ public class Camera extends AbstractGameObject {
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             yawIgnoreY(-rotationPerSecond * deltaTime);
         }
-        /*if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            pitch(rotationPerSecond * deltaTime);
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            pitch(-rotationPerSecond * deltaTime);
-        }*/
         if(Gdx.input.isKeyPressed(Input.Keys.A)) {
             velocity.x -= speed * deltaTime;
         }
@@ -268,13 +179,16 @@ public class Camera extends AbstractGameObject {
         velocity.z = oldVelocity.x * u.z + oldVelocity.y * v.z + oldVelocity.z * n.z;
     }
 
-    /*
-        public void slide(float delU, float delV, float delN){
-        eye.x += delU * u.x + delV * v.x + delN * n.x;
-        eye.y += delU * u.y + delV * v.y + delN * n.y;
-        eye.z += delU * u.z + delV * v.z + delN * n.z;
+    public void addCollisionEdges(ArrayList<CollisionEdge> collisionEdges, float padding){
+        Point3D leftTop = new Point3D(eye.x - (objectRadius + padding), 0, eye.z + (objectRadius + padding));
+        Point3D leftBottom = new Point3D(eye.x - (objectRadius + padding), 0, eye.z - (objectRadius + padding));
+        Point3D rightTop = new Point3D(eye.x + (objectRadius + padding), 0, eye.z + (objectRadius + padding));
+        Point3D rightBottom = new Point3D(eye.x + (objectRadius+ padding), 0, eye.z - (objectRadius + padding));
+        collisionEdges.add(new CollisionEdge(leftTop, leftBottom));
+        collisionEdges.add(new CollisionEdge(leftTop, rightTop));
+        collisionEdges.add(new CollisionEdge(leftBottom, rightBottom));
+        collisionEdges.add(new CollisionEdge(rightTop, rightBottom));
     }
-     */
 
 	@Override
 	public void draw() {
