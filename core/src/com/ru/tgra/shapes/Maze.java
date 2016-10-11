@@ -35,11 +35,11 @@ public class Maze implements GameObject {
 		//drawFloor();
 	}
 
-	public ArrayList<CollisionEdge> getCollisionEdges(){
+	public ArrayList<CollisionEdge> getCollisionEdges(float wallPadding){
 		ArrayList<CollisionEdge> edges = new ArrayList<CollisionEdge>();
 		for(int x = 0; x < cells.length; x++){
 			for(int z = 0; z < cells[0].length; z++){
-				cells[x][z].addCollisionEdges(edges);
+				cells[x][z].addCollisionEdges(edges, wallPadding);
 			}
 		}
 		//wall.addCollisionEdges(edges);

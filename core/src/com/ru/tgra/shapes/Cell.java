@@ -53,10 +53,10 @@ public class Cell implements GameObject{
     		this.bottomWall.draw();
     }
 
-    public void addCollisionEdges(ArrayList<CollisionEdge> collisionEdges) {
+    public void addCollisionEdges(ArrayList<CollisionEdge> collisionEdges, float wallPadding) {
         if(left)
-            leftWall.addCollisionEdges(collisionEdges);
+            leftWall.addCollisionEdges(collisionEdges, wallPadding);
         if(bottom)
-            bottomWall.addCollisionEdges(collisionEdges);
+            bottomWall.addCollisionEdges(collisionEdges, wallPadding);
     }
 }

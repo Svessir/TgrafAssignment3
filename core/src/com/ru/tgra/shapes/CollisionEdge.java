@@ -1,9 +1,9 @@
 package com.ru.tgra.shapes;
 
 public class CollisionEdge {
-	public final Point3D point1;
-	public final Point3D point2;
-	public final Vector3D normal;
+	private Point3D point1;
+	private Point3D point2;
+	private Vector3D normal;
 
 	public CollisionEdge(Point3D point1, Point3D point2){
 		this.point1 = point1;
@@ -13,8 +13,10 @@ public class CollisionEdge {
 	}
 
 	public Collision getCollision(CollisionVertex vertex){
+		
 		Point3D vertexPoint = vertex.getVertex();
 		Vector3D velocityVector = vertex.getVelocity();
+		
 		float tHit = normal.dot(new Vector3D(point1.x - vertexPoint.x, 0.0f, point1.z - vertexPoint.z))/ normal.dot(velocityVector);
 
 		float col_x = vertexPoint.x + velocityVector.x * tHit;
@@ -28,28 +30,19 @@ public class CollisionEdge {
 		Vector3D reflectionVector = getReflectionVector(velocityVector);
 		Vector3D newTravelVector = null;
 
-		System.out.println("vertexrRad: "+ vertex.getRadius());
-		System.out.println("colX: "+ col_x);
-		System.out.println("colZ: "+ col_z);
-
 		if(velocityVector.x >= 0 && reflectionVector.x < 0){
-			System.out.println("col_x - vertex.getRadius()= " + (col_x - vertex.getRadius()));
-			newTravelVector = new Vector3D(col_x - vertex.getRadius() - vertexPoint.x, velocityVector.y, velocityVector.z);
+			newTravelVector = new Vector3D(col_x - vertexPoint.x - 0.001f, velocityVector.y, velocityVector.z);
 		}
 		else if(velocityVector.x < 0 && reflectionVector.x >= 0){
-			System.out.println("col_x + vertex.getRadius()= " + (col_x + vertex.getRadius()));
-			newTravelVector = new Vector3D(col_x + vertex.getRadius() - vertexPoint.x, velocityVector.y, velocityVector.z);
+			newTravelVector = new Vector3D(col_x - vertexPoint.x + 0.001f, velocityVector.y, velocityVector.z);
 		}
 		else if(velocityVector.z >= 0 && reflectionVector.z < 0){
-			System.out.println("col_z - vertex.getRadius()= " + (col_z - vertex.getRadius()));
-			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertex.getRadius() - vertexPoint.z);
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertexPoint.z - 0.001f);
 		}
 		else{
-			System.out.println("col_z + vertex.getRadius()= " + (col_z + vertex.getRadius()));
-			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z + vertex.getRadius() - vertexPoint.z);
+			newTravelVector = new Vector3D(velocityVector.x, velocityVector.y, col_z - vertexPoint.z + 0.001f);
 		}
-
-		System.out.println("velocity " + velocityVector + ", newVelocity: " + newTravelVector);
+		
 		return new Collision(newTravelVector, tHit);
 	}
 

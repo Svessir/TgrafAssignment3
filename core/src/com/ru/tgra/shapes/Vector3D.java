@@ -12,6 +12,13 @@ public class Vector3D {
 		this.y = y;
 		this.z = z;
 	}
+	
+	public Vector3D(Vector3D vector)
+	{
+		this.x = vector.x;
+		this.y = vector.y;
+		this.z = vector.z;
+	}
 
 	public void scale(float S)
 	{

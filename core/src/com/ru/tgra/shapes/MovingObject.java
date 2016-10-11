@@ -1,7 +1,6 @@
 package com.ru.tgra.shapes;
 
 import com.badlogic.gdx.Gdx;
-import com.sun.org.apache.xpath.internal.operations.Mod;
 
 import java.awt.*;
 

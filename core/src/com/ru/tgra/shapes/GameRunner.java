@@ -114,8 +114,8 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	public Collision getCollision(CollisionVertex vertex){
 
 		Collision latestCollision = null;
+		ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges(vertex.getRadius());
 		do {
-			ArrayList<CollisionEdge> collisionEdges = maze.getCollisionEdges();
 			ArrayList<Collision> collisions = new ArrayList<Collision>();
 			for (CollisionEdge edge : collisionEdges) {
 				Collision collision = edge.getCollision(vertex);
