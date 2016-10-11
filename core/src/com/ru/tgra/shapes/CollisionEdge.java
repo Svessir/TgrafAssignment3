@@ -28,7 +28,7 @@ public class CollisionEdge {
 		Vector3D reflectionVector = getReflectionVector(velocityVector);
 		Vector3D newTravelVector = null;
 
-		System.out.println("vertexrRad: "+ vertex.getRadius());
+		System.out.println("vertexRad: "+ vertex.getRadius());
 		System.out.println("colX: "+ col_x);
 		System.out.println("colZ: "+ col_z);
 

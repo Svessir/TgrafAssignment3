@@ -54,16 +54,13 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 
 		cam = new Camera();
 		cam.Look3D(new Point3D(5, 0, 2), new Point3D(0,0,0), new Vector3D(0,1,0));
-		cam.PerspctiveProjection3D(90, 2, 0.001f, 100);
+		cam.PerspctiveProjection3D(90, 16/9, 0.001f, 100);
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
 		maze = new Maze(size);
 		orthoCam = new Camera();
 		orthoCam.OrthographicProjection3D(-size, size, -size, size, 0.4f, 1000);
 		movingObject = new MovingObject(5, 0, 5, 0.3f);
-		light = new MovingObject(10, 10, 10, 0.1f);
-
-
 	}
 
 	private void update()
@@ -76,39 +73,57 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 	private void display()
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		shader.setLightPosition(12.0f, 7.0f, 10.0f, 1.0f);
-		shader.setLightColor(0.0f, 1.0f, 1.0f, 1.0f);
+		setLightPositions();
 
-		shader.setGlobalAmbient(0.1f, 0.1f, 0.1f, 1.0f);
-
-		shader.setMaterialDiffuse(0.9f, 0.3f, 0.1f, 1.0f);
-		shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-		shader.setShininess(30.0f);
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
-		ModelMatrix.main.loadIdentityMatrix();
 
+		ModelMatrix.main.loadIdentityMatrix();
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
 		shader.setViewMatrix(cam.getViewMatrix());
 		shader.setProjectionMatrix(cam.getProjectionMatrix());
 		shader.setEyePosition(cam.eye.x, cam.eye.y, cam.eye.z, 1.0f);
-		light.draw();
+		shader.setMaterialDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+		shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 		maze.draw();
 		movingObject.draw();
+
 		Gdx.gl.glViewport(-400, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
 		orthoCam.Look3D(new Point3D(7.0f, 40.0f, 7.0f), new Point3D(0.0f, 0.0f, 0.0f), new Vector3D(0, 0, -1));
-		//orthoCam.Look3D(new Point3D(cam.eye.x, 40.0f, cam.eye.z), cam.eye, new Vector3D(0, 0, -1));
+
 		shader.setViewMatrix(orthoCam.getViewMatrix());
 		shader.setProjectionMatrix(orthoCam.getProjectionMatrix());
 		shader.setEyePosition(orthoCam.eye.x, orthoCam.eye.y, orthoCam.eye.z, 1.0f);
+		shader.setMaterialDiffuse(0.0f, 0.1f, 1.0f, 1.0f);
+		shader.setMaterialSpecular(1.0f, 1.0f, 1.0f, 1.0f);
 		maze.draw();
-		shader.setMaterialDiffuse(1, 1, 1, 1.0f);
 		ModelMatrix.main.pushMatrix();
 		ModelMatrix.main.addTranslation(cam.eye.x, cam.eye.y, cam.eye.z);
 		ModelMatrix.main.addScale(0.5f, 0.5f, 0.5f);
 		shader.setModelMatrix(ModelMatrix.main.getMatrix());
 		BoxGraphic.drawSolidCube();
 		ModelMatrix.main.popMatrix();
+
+	}
+
+	private void setLightPositions(){
+		shader.setLightPosition(5.0f, 12.0f, 0.0f, 1.0f);
+		shader.setLight2Position(2.0f, 5.0f, 8.0f, 1.0f);
+		shader.setLight3Position(9.0f, 8.0f, 6.0f, 1.0f);
+
+		shader.setLightDiffuse(0.4f, 0.1f, 0.1f, 1.0f);
+		shader.setLightSpecular(1.0f, 0.0f, 0.0f, 1.0f);
+
+		shader.setLight2Diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+		shader.setLight2Specular(1.0f, 1.0f, 1.0f, 1.0f);
+
+		shader.setLight3Diffuse(0.1f, 0.4f, 0.1f, 1.0f);
+		shader.setLight3Specular(1.0f, 1.0f, 1.0f, 1.0f);
+
+		shader.setShininess(50.0f);
+
+		shader.setGlobalAmbient(0.1f, 0.2f, 0.3f, 1.0f);
 	}
 
 	public Collision getCollision(CollisionVertex vertex){
