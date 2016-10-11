@@ -27,8 +27,8 @@ void main()
 {
     float lambert = max(0.0, dot(v_normal, v_s) / (length(v_normal) * length(v_s)));
     float phong = max(0.0, dot(v_normal, v_h) / (length(v_normal) * length(v_h)));
-    vec4 diffuseColor = lambert * u_lightColorDiffuse * u_materialDiffuse;     // lambert * u_lightDiffuse * u_materialDiffuse
-    vec4 specularColor = pow(phong, u_materialShininess) * u_lightColorSpecular * u_materialSpecular;   // u_lightSpecular1 *
+    vec4 diffuseColor = lambert * u_lightColorDiffuse * u_materialDiffuse;
+    vec4 specularColor = pow(phong, u_materialShininess) * u_lightColorSpecular * u_materialSpecular;
 
     vec4 lightColor1 = diffuseColor + specularColor;
 
@@ -46,7 +46,5 @@ void main()
 
     vec4 lightcolor3 = diffuseColor + specularColor;
 
-    gl_FragColor = u_globalAmbient + lightColor1 + lightcolor2 + lightcolor3;// + lightcolor2 + lightcolor3;
-    //gl_FragColor = u_globalAmbient + u_materialDiffuse + lightColor1;
-
+    gl_FragColor = u_globalAmbient + lightColor1 + lightcolor2 + lightcolor3;
 }

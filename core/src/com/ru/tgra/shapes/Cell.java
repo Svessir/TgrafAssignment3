@@ -14,11 +14,6 @@ public class Cell implements GameObject{
     
     public Wall leftWall;
     public Wall bottomWall;
-    
-    public Cell() {
-        left = true;
-        bottom = true;
-    }
 
     public Cell(boolean left, boolean bottom) {
         this.left = left;
@@ -26,27 +21,6 @@ public class Cell implements GameObject{
     }
     
     public void draw() {
-    	/*float translationX = width / 2.0f;
-    	float translationZ = height / 2.0f;
-    	
-    	if (left) {
-	    	ModelMatrix.main.pushMatrix();
-	    	ModelMatrix.main.addTranslation(-translationX, 0, 0);
-	    	ModelMatrix.main.addScale(0.2f, 1, 1);
-	    	ModelMatrix.main.setShaderMatrix();
-	    	BoxGraphic.drawSolidCube();
-	    	ModelMatrix.main.popMatrix();
-    	}
-    	
-    	if(bottom) {
-	    	ModelMatrix.main.pushMatrix();
-	    	ModelMatrix.main.addTranslation(0, 0, -translationZ);
-	    	ModelMatrix.main.addScale(1, 1, 0.2f);
-	    	ModelMatrix.main.setShaderMatrix();
-	    	BoxGraphic.drawSolidCube();
-	    	ModelMatrix.main.popMatrix();
-    	}*/
-    	
     	if(left)
     		this.leftWall.draw();
     	if(bottom)

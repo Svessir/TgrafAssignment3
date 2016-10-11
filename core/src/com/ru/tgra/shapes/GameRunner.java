@@ -35,10 +35,6 @@ public class GameRunner extends ApplicationAdapter implements InputProcessor {
 		shader = new Shader();
 		Gdx.input.setInputProcessor(this);
 
-
-		//COLOR IS SET HERE
-		//shader.setColor(0.7f, 0.2f, 0, 1);
-
 		BoxGraphic.create(shader.getVertexPointer(), shader.getNormalPointer());
 		SphereGraphic.create(shader.getVertexPointer(), shader.getNormalPointer());
 		SincGraphic.create(shader.getVertexPointer());

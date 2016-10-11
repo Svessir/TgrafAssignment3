@@ -28,7 +28,6 @@ public class Shader {
     private int lightPosLoc;
     private int light2PosLoc;
     private int light3PosLoc;
-    private int lightColorLoc;
     private int matDifLoc;
     private int matSpecLoc;
     private int lightColorDifLoc;
